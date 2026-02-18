@@ -22,6 +22,18 @@ in-zone:
     # styles: https://javadoc.io/static/net.kyori/adventure-api/4.17.0/net/kyori/adventure/bossbar/BossBar.Overlay.html
     style: NOTCHED_20
 
+in-zone-minehut:
+  title: "&#CC0055⌚ &7| &#FF8855ʏᴏᴜ ᴀʀᴇ ᴀғᴋ &7| &#CC0055⌚"
+  subtitle: "&#FFBB00Next reward in: &#CC0055%time%"
+  actionbar: ""
+  # remove the section to disable
+  bossbar:
+    name: "&#CC0055⌚ &7| &#FF8855ʏᴏᴜ ᴀʀᴇ ᴀғᴋ &7| &#FFBB00Next reward in: &#CC0055%time%"
+    # colors: https://javadoc.io/static/net.kyori/adventure-api/4.17.0/net/kyori/adventure/bossbar/BossBar.Color.html
+    color: RED
+    # styles: https://javadoc.io/static/net.kyori/adventure-api/4.17.0/net/kyori/adventure/bossbar/BossBar.Overlay.html
+    style: NOTCHED_20
+
 # the required permission to gain rewards in this zone
 # example: axafkzone.vip
 # set to "" to disable, so everyone will get rewards

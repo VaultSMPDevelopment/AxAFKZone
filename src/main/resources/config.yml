@@ -7,6 +7,8 @@ prefix: "<gradient:#FF8800:#CC0055><b>AxAFKZone</b></gradient> &7» "
 # 3 - text format, for example 01h 25m 35s
 timer-format: 1
 
+minehut-ips: ["68.169.100.177", "vaultsmp.minehut.gg"]
+
 # you must define at least 1
 # requires a restart to update
 command-aliases:

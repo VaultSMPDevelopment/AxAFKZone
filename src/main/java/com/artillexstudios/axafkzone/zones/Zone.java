@@ -1,5 +1,6 @@
 package com.artillexstudios.axafkzone.zones;
 
+import com.artillexstudios.axafkzone.AxAFKZone;
 import com.artillexstudios.axafkzone.reward.Reward;
 import com.artillexstudios.axafkzone.selection.Region;
 import com.artillexstudios.axafkzone.utils.RandomUtils;
@@ -17,6 +18,8 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Title;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ import static com.artillexstudios.axafkzone.AxAFKZone.CONFIG;
 import static com.artillexstudios.axafkzone.AxAFKZone.MESSAGEUTILS;
 
 public class Zone {
+    private static final Logger log = LoggerFactory.getLogger(Zone.class);
     private final ConcurrentHashMap<Player, Integer> zonePlayers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Player, BossBar> bossbars = new ConcurrentHashMap<>();
     private final LinkedList<Reward> rewards = new LinkedList<>();
@@ -123,7 +127,7 @@ public class Zone {
         zonePlayers.put(player, 0);
 
         Section section;
-        if ((section = settings.getSection("in-zone.bossbar")) != null) {
+        if ((section = settings.getSection(inZonePrefix(player) + ".bossbar")) != null) {
             bossBar = BossBar.create(
                     StringUtils.format(section.getString("name").replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
                     1,
@@ -148,8 +152,8 @@ public class Zone {
     }
 
     private void sendTitle(Player player) {
-        String zoneTitle = settings.getString("in-zone.title", null);
-        String zoneSubTitle = settings.getString("in-zone.subtitle", null);
+        String zoneTitle = settings.getString(inZonePrefix(player) + ".title", null);
+        String zoneSubTitle = settings.getString(inZonePrefix(player) + ".subtitle", null);
         if (zoneTitle != null && !zoneTitle.isBlank() || zoneSubTitle != null && !zoneSubTitle.isBlank()) {
             Title title = Title.create(
                     zoneTitle == null ? Component.empty() : StringUtils.format(zoneTitle.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))),
@@ -166,7 +170,7 @@ public class Zone {
     }
 
     private void sendActionbar(Player player) {
-        String zoneActionbar = settings.getString("in-zone.actionbar", null);
+        String zoneActionbar = settings.getString(inZonePrefix(player) + ".actionbar", null);
         if (zoneActionbar != null && !zoneActionbar.isBlank()) {
             ActionBar.send(player, StringUtils.format(zoneActionbar.replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))));
         }
@@ -183,12 +187,33 @@ public class Zone {
         bossBar.progress(Math.max(0f, Math.min(1f, barDirection == 0 ? 1f - calculated : calculated)));
 
         Section section;
-        if ((section = settings.getSection("in-zone.bossbar")) != null) {
+        if ((section = settings.getSection(inZonePrefix(player) + ".bossbar")) != null) {
             bossBar.title(StringUtils.format(section.getString("name").replace("%time%", TimeUtils.fancyTime(timeUntilNext(player)))));
         }
     }
 
+    private String inZonePrefix(final Player player) {
+        return isMinehut(player)
+            ? "in-zone-minehut"
+            : "in-zone";
+    }
+
+    private boolean isMinehut(final Player player) {
+        final String domain = player.getVirtualHost() != null
+            ? player.getVirtualHost().getHostName()
+            : "N/A";
+
+        log.info("domainnn {}", domain);
+        return CONFIG.getStringList("minehut-ips", List.of())
+            .contains(domain);
+    }
+
     private void giveRewards(Player player, int newTime) {
+        // ignore minehut players completely
+        if(isMinehut(player)) {
+            return;
+        }
+
         final List<Reward> rewardList = rollAndGiveRewards(player);
         if (settings.getStringList("messages.reward").isEmpty()) return;
 
