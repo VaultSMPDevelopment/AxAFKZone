@@ -203,7 +203,6 @@ public class Zone {
             ? player.getVirtualHost().getHostName()
             : "N/A";
 
-        log.info("domainnn {}", domain);
         return CONFIG.getStringList("minehut-ips", List.of())
             .contains(domain);
     }
